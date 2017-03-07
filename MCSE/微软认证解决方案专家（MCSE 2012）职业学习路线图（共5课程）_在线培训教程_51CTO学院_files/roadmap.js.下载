@@ -1,0 +1,212 @@
+﻿/**
+ * 学习路线图
+ * @version 0.1 测试版
+ */
+
+function rmOption(option, data) {
+	var rm_id = $(data).parent('div').attr('rm_id');
+	var user_id = $(data).parent('div').attr('user_id');
+	
+	if(!user_id) {
+		noLoginTrip();
+		return false;
+	}
+	
+	if(option == 'collect') {
+		addCollect(rm_id);
+	} else if(option == 'grade') {
+		var op = $(data).attr('op');
+		addGrade(rm_id, op);
+	}
+}
+
+
+
+//收藏操作
+function addCollect(rm_id) {
+	var isCollect = $('#collectText').attr('class');
+
+	if(isCollect == 'false') {
+		return false;
+	}else if(isCollect == 'ac') {
+		$('#collectText').attr('class', 'ac');
+		$.ajax({
+			url:'/index.php?do=roadmap&m=delCollect',
+			type:'post',
+			data:{
+				rm_id:rm_id
+			},
+			dataType:'json',
+			success:function(data) {
+				if(data.status) {
+					$('#collectNums').html(data.nums);
+					$('#collectText').html('收藏');
+					$('#collectText').attr('class','nc')
+				} else {
+					$('#collectText').attr('class', 'ac');
+				}
+				new AutoBox({
+					'id':'favMsgBox',
+					'content':'取消收藏成功！',
+					'noCBtn':true,
+					'autoClose':2
+				});
+			},
+			beforeSend: function(){
+				$('#collectText').attr('class', 'false');//不能连续点击
+			}
+			
+		})		
+	} else if(isCollect == 'nc'){
+		$.ajax({
+			url:'/index.php?do=roadmap&m=addCollect',
+			type:'post',
+			data:{
+				rm_id:rm_id
+			},
+			dataType:'json',
+			success:function(data) {
+				if(data.status) {
+					$('#collectNums').html(data.nums);
+					$('#collectText').html('取消收藏');
+					$('#collectText').attr('class','ac')
+				} else {
+					$('#collectText').attr('class', 'nc');
+				}
+				new AutoBox({
+						'id':'favMsgBox',
+						'content':'收藏成功！',
+						'ADD':$('<p style="text-align:center;">进入 <a href="/index.php?do=user&m=roadmap" style="color:#00baf2;" target="_blank">我的收藏&gt;&gt;</a> 查看所有收藏列表</p>')
+				});	
+			},
+			beforeSend: function(){
+				$('#collectText').attr('class', 'false');//不能连续点击
+			}
+			
+		})
+	}
+}
+
+// 顶/踩 操作
+function addGrade(rm_id, op) {
+	var gradeType = $('.tool').attr('grade');
+	$('.tool').attr('grade', 'false')//不能连续点击
+	var msg = '';
+	var msgLeft = 0;
+	if(gradeType == '') {
+		$.ajax({
+			url:'/index.php?do=roadmap&m=addGrade',
+			type:'post',
+			data:{
+				rm_id:rm_id,
+				op:op
+			},
+			dataType:'json',
+			success:function(data) {
+				if(data.status) {
+					$('#gradeNums_'+op).html(data.nums);
+					$('.tool').attr('grade', op)
+				} else {
+					gradeMsg(data.msg, data.left);
+				}
+			}
+		})
+	} else if(gradeType == 'false') {
+		return false;
+	} else {
+		if(gradeType == '0' && op == '0') {
+			msg = '已赞过';
+			msgLeft = 100;
+		} else if(gradeType == '1' && op == '1') {
+			msg = '已踩过';
+			msgLeft = 125;
+		} else if(gradeType == '0' && op == '1') {
+			msg = '您已赞过不能踩了';
+			msgLeft = 70;
+		} else if(gradeType == '1' && op == '0') {
+			msg = '您已踩过不能赞了';
+			msgLeft = 65;
+		} else {
+			msg = '您已经参与过了';
+			msgLeft = 65;
+		}
+		gradeMsg(msg, msgLeft);
+		$('.tool').attr('grade', gradeType)
+	}
+}
+
+// 赞 踩 提示
+function gradeMsg(msg, left) {
+	$('.grade-msg').css({left:left});
+	$('.grade-msg').find('.t').html(msg);
+	
+	$('.grade-msg').fadeIn('slow', function() {
+		setTimeout(gradeMsgDis, 2000);
+	});
+}
+//隐藏提示
+function gradeMsgDis() {
+	$('.grade-msg').fadeOut('fast', function() {
+		//$('.grade-msg').find('.t').html('');
+	});
+}
+
+//提示窗
+function rmTips(msg, icon)
+{
+	$.dialog.tips('<font style="font-weight:600;">' + msg + '</font>',2,icon + '.gif');
+}
+
+
+$(function() {
+	$('#collectBtn').bind('click', function() {
+		rmOption('collect', this);
+	});
+	
+	$('.gradeBtn').bind('click', function() {
+		rmOption('grade', this);
+	});
+	
+	$('.tab-bd-in li').live('mouseover', function() {
+		$(this).find('p').show();
+	})
+	
+	$('.tab-bd-in li').live('mouseout', function() {
+		$(this).find('p').hide();
+	})
+	
+	//课程、部分 弹出介绍
+	$('.les-btn,.step-btn').live('mouseover', function() {
+		$(this).children('div.w').show();
+	});
+	//课程、部分 弹出介绍
+	$('.les-btn,.step-btn').live('mouseout', function() {
+		$(this).children('div.w').hide();
+	});
+	
+	$(".map-lec").slide({ mainCell:".tab-bd-in", effect:"left", delayTime:360,pnLoop:false,easing:"easeOutCubic" })
+	
+	var user_id = $('.tool').attr('user_id');
+	if(user_id) {
+		$('.loadbar').each(function(i) {
+			var rp = $(this).attr('rp');
+			//var rp = 50;
+			var ph = $(this).height();
+			var rpH = ph - 47;
+			rpH = rpH * rp / 100;
+			rp = parseInt(rp);
+			if(rp > 0){
+				$(this).find('.loadbar-in').find('.load-num').show();
+			}
+			$(this).find('.loadbar-in').animate({height:rpH}, 'slow');
+			$(this).find('.loadbar-in').find('.load-num').css({top:rpH});
+			$(this).find('.loadbar-in').find('.w').css({top:rpH-7});
+		})
+		$('.loadbar-in').live('mouseover', function() {
+			$(this).find('.w').css({'display':'block'});
+		})
+		$('.loadbar-in').live('mouseout', function() {
+			$(this).find('.w').css({'display':'none'});
+		})
+	}
+})

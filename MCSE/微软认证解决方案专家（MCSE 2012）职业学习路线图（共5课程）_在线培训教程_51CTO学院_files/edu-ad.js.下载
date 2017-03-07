@@ -1,0 +1,170 @@
+/*
+ * edu ad
+ *  
+ * version: 0.0.1 - 2014-06-17
+ * 
+ * @requires jQuery v1.7 or later
+ * @author siyuantlw<839187696@qq.com>
+ */
+
+var SYAD = {
+	ad_url : '',
+	course_id : '',
+	rm_id : '',
+	ad_id : ''
+};
+
+//ad list
+SYAD.adLoad = function() {
+	$('.edu-ad').each(function() {
+		var adObj = $(this);
+		SYAD.setScope(adObj);
+		SYAD.getAd(adObj);
+	});
+}
+//get ad
+SYAD.getAd = function(adObj) {
+	var len = $('.edu-ad').length;
+	$.ajax({
+		url : SYAD.ad_url,
+		type : 'post',
+		data : {course_id : SYAD.course_id, ad_id : SYAD.ad_id, rm_id : SYAD.rm_id},
+		dataType : 'json',
+		success : function(data) {
+			SYAD.showAd(data, adObj);
+			
+			if(len == j){
+				var adid = $(".site_ad").html();
+				if(adid != '0'){
+					var bglog = {};
+					bglog.kind = 7;
+					bglog.sessionid = sessionid;
+					bglog.cookieid = vv_log.isCookie('cookiename');
+					bglog.userid = user_id;
+					bglog.course_id = pv_log.course_id()[0];
+					bglog.refer = encodeURIComponent(vv_log.from_referrer().replace(/&/g,'<#>'));
+					bglog.cur = encodeURIComponent(vv_log.cur_url().replace(/&/g,'<#>'));
+					bglog.title = encodeURIComponent(pv_log.title);
+					bglog.ip = ip;
+					bglog.rmid = pv_log.id()[0];
+					bglog.packid = (vv_log.cur_url()).indexOf(courseUrl) != '-1' || (vv_log.cur_url()).indexOf(courseUrl2) != '-1' ? pv_log.course_id()[2] : pv_log.id()[1];
+					bglog.cardid = pv_log.id()[2];
+					bglog.lecid = pv_log.id()[3];
+					bglog.levelid = pv_log.course_id()[1];
+					bglog.ifnew = pv_log.ifnew('ifnewuser');
+					bglog.adid = adid;
+					bglog.agents = encodeURIComponent(navigator.userAgent);
+					bglog.time = vv_log.timestamp();
+					bglog.cookieidOther = vv_log.getCookie('www51cto') ? vv_log.getCookie('www51cto') : 0;
+					bglog.unitType = 'pc';
+					bglog.source = source;
+
+					var str = '';
+					for(var key in bglog){
+						str = str + bglog[key]+'&';
+					}
+					str = str.substr(0,str.length-1);
+					vv_log.send( str);	
+				}
+				
+			}
+		}
+	})
+}
+
+//set ad scope
+SYAD.setScope = function(adObj) {
+	SYAD.course_id = adObj.attr('course_id');
+	SYAD.rm_id = adObj.attr('rm_id');
+	SYAD.ad_id = adObj.attr('ad_id');
+}
+
+//show ad
+/* 数据分析使用 begin */
+var adstr = '';	
+var j = 0;
+var s_ad = $("<span style='display:none;' id='site_ad' class='site_ad'>0</span>");
+$('body').append(s_ad);
+/* 数据分析使用 end */
+SYAD.showAd = function(data, adObj) {
+	if(data.status == false) {
+		//adObj.hide();
+		j++;
+	} else {
+		j++;
+		adObj.html(data.ad_content);
+
+		var ad_id = adObj.attr('ad_id');
+		if(ad_id == 2) {
+			showTopAD();
+		}
+
+		var showId = adObj.attr('show_id');
+		var isShow = adObj.attr('isShow');
+		
+		if(isShow == 'none') return ;
+		
+		if(showId != '') {
+			adObj = $('#'+showId);
+		}
+		
+		var adDis = adObj.css('display');
+		
+		if(adDis == 'none' && isShow != 'rad') {
+			adObj.fadeIn('slow');
+		}
+		//右侧广告位
+		if(isShow == 'rad') {
+			$('#edu-rad').click();
+		}
+		
+		/*
+		 * 数据分析使用 begin
+		 * 站内广告位统计 zhangyu
+		*/
+		adstr = adstr + data.type_id+'#';
+		$(".site_ad").html(adstr.substr(0,adstr.length-1));
+		/* 数据分析使用 end */
+		
+	}	
+}
+
+SYAD.ad_url = '/index.php?do=advert&v=' + Math.ceil(new Date());
+
+$(function() {
+	SYAD.adLoad();
+})
+
+//顶部广告 伸缩 展示
+// Create @ 2015/3/16
+// By Ravens
+function showTopAD(){
+	var newHeaderTopShow = getCookie('newHeaderTopShow');
+	//console.log(newHeaderTopShow);
+	if(newHeaderTopShow && newHeaderTopShow > 0){
+		$('#edu-header-ad-kg').attr('isShow', 'none');//隐藏
+	}else{
+		$("#edu-header-ad").slideDown(500);
+		var ads = [];
+		if($('.Header-ad-list a').length > 1){
+			$('.Header-ad-list a').each(function(v,e){
+				ads[v] = e;
+			});
+			setInterval(function(){
+				$(ads[1]).slideDown();
+				$(ads[0]).slideUp(500);
+				
+				ads.push(ads.shift());
+			},3000);
+		}
+	}
+	$(".CloseEDUAD").click(function(){
+		$("#edu-header-ad").slideUp(500,function(){
+			$(this).remove();
+		});
+		setCookie('newHeaderTopShow', 1, 0);//当前会话结束
+	});
+}
+function CirAD(){
+}
+//End

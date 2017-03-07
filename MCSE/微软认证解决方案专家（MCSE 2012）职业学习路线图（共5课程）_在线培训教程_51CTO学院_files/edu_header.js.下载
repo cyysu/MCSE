@@ -1,0 +1,455 @@
+//defaultSearchText = defaultSearchText ? defaultSearchText : '搜索课程/讲师';
+defaultSearchText = typeof(defaultSearchText)!='undefined' ? defaultSearchText : '找课程、找讲师';
+
+//搜索
+function checkqform(){
+	if ($("#q").val()=="" || $("#q").val()=='找课程、找讲师'){
+		if(defaultSearchText!='找课程、找讲师') $("#q").val(defaultSearchText);
+		return false;
+	}
+};
+
+//学习记录
+function recBox() {
+	$.ajax({
+		type:'post',
+		url:'/index.php?do=log&m=ulog',
+		data:{},
+		success:function(data) {
+			$('.rec-box').html(data);
+
+			$(".srLi").bind('mouseover',function(){
+				$(this).children("p.LookAT").css('display','none');
+				$(this).children("p.StudyGoOn").css('display','block');
+			}).bind('mouseleave',function(){
+				$(this).children("p.LookAT").css('display','block');
+				$(this).children("p.StudyGoOn").css('display','none');
+			});
+		}
+	});
+	
+}
+
+//删除学习记录
+function removePlayLog(id) {
+	$.ajax({
+		type:'post',
+		url:'/index.php?do=log&m=tulog',
+		data:{id:id},
+		success:function(data) {
+			recBox();
+		}
+	})
+}
+
+$(function() {
+	$(".UserLinkLi>p").bind('mouseenter',function(){
+		$(".UserLinkLi>p").next().hide();
+		$(this).next().show();
+	});
+	$(".UserLinkLi>p").next().bind('mouseleave',function(){
+		$(this).hide();
+	});
+	// $(".UserLinkLi>ul,.StudyRecord").bind('mouseleave',function(){
+	// 	$(this).hide();
+	// });
+	$(".Search input").focus(function(){//
+		this.defaultTxt = '找课程、找讲师';
+		if($(this).val()==this.defaultTxt){
+			$(this).val('');
+			$(this).css({'color':'#333'});
+		}
+	}).blur(function(){//
+		if($(this).val()==''){
+			//$(this).val(this.defaultTxt)
+			$(this).css({'color':'#999'});
+		}
+	});
+
+	//搜索框
+	$(".Search").find('input[name="q"]').focus(function(){//
+		this.defaultTxt = '找课程、找讲师';
+		if($(this).val()==this.defaultTxt){
+			$(this).val('');
+			$(this).css({'color':'#333'});
+		};
+		$("#SearchTypeChange").show();
+	}).blur(function(){//
+		if($(this).val()==''||$(this).val()==this.defaultTxt){
+			$(this).css({'color':'#999'});
+			//$(this).val(this.defaultTxt)
+		}
+	}).bind('keyup',function(e){
+		var me = this;
+		var sTypeIn = SplitString(this.value,4);
+		var searchList = $('<ul id="SearchTypeChange"></ul>');
+			sListItem1 = $('<li class="SearchTypeChangeCur" m="course">搜 "<span class="blue">'+sTypeIn+'</span>" 相关课程</li>');
+			sListItem2 = $('<li m="pack">搜 "<span class="blue">'+sTypeIn+'</span>" 相关套餐</li>');
+			//sListItem3 = $('<li m="member">搜 "<span class="red">'+sTypeIn+'</span>" 相关会员卡</li>');
+			sListItem4 = $('<li m="roadmap">搜 "<span class="blue">'+sTypeIn+'</span>" 相关路线图</li>');
+			sListItem5 = $('<li m="lecturer">搜 "<span class="blue">'+sTypeIn+'</span>" 相关讲师</li>');
+			//searchList.append(sListItem1).append(sListItem2).append(sListItem3).append(sListItem4).append(sListItem5);
+			searchList.append(sListItem1).append(sListItem2).append(sListItem4).append(sListItem5);
+			searchList.css({
+				'position':'absolute',
+				'left':$(this).offset().left-1,
+				'border':'1px solid #15b1e4',
+				'border-top':'none',
+				'background':'#FFF',
+				'padding-top':'2px',
+				'text-align':'left',
+				'top':$(this).offset().top+20,
+				'width':$(this).width()
+			});
+		if(e.keyCode == 38 ){
+			var I = $(".SearchTypeChangeCur").index()
+			if(I>0){
+				$(".SearchTypeChangeCur").removeClass('SearchTypeChangeCur').prev().addClass('SearchTypeChangeCur')
+				$('#_SearchType').val($(".SearchTypeChangeCur").attr('m'));
+			}
+		}else if(e.keyCode == 40){
+			var I = $(".SearchTypeChangeCur").index()
+			if(I<3){
+				$(".SearchTypeChangeCur").removeClass('SearchTypeChangeCur').next().addClass('SearchTypeChangeCur')
+				$('#_SearchType').val($(".SearchTypeChangeCur").attr('m'));
+			}
+		}else{
+			if($("#SearchTypeChange").length > 0){
+				$("#SearchTypeChange li span").text(sTypeIn);
+			}else{
+				$('body').append(searchList);
+				searchList.find('li').bind('mouseover',function(){
+					$(this).addClass('SearchTypeChangeCur').siblings().removeClass('SearchTypeChangeCur');
+					$('#_SearchType').val($(this).attr('m'));
+				}).bind('click',function(){
+
+					$('#q-form').submit();
+				});
+				searchList.bind('mouseleave',function(){
+					$(this).hide();
+				});
+
+			}
+		};
+
+		if(this.value.length == 0){
+			$("#SearchTypeChange").remove();
+			searchList.find('li').unbind()
+		}
+	}).bind('mouseenter',function(){
+		$("#SearchTypeChange").show();
+	});
+	//Search End
+	$(".nav_personal").hover(
+	  function () {
+		$(".rec-box").css("display","block");
+	  },
+	  function () {
+		$(".rec-box").css("display","none");
+	  }
+	);
+
+	$(".sub").hover(
+	  function () {
+	    $(this).addClass("cur");
+		$(".submenu").css("display","block");
+	  },
+	  function () {
+	    $(this).removeClass("cur");
+		$(".submenu").css("display","none");
+	  }
+	);
+
+	//搜索start
+	$("#q").live("click",function(){
+		if ($("#q").val()=="" || $("#q").val()==defaultSearchText || $("#q").val()==defaultSearchText){
+			$("#q").val("");
+
+		}
+	});
+	$("#q").live("blur",function(){
+		if ($("#q").val()==""){
+			//$("#q").val(defaultSearchText);
+		}
+	});
+	//搜索 end
+	
+	//学习记录 start
+	recBox();
+
+	$('.recListD').live('mouseover', function() {
+		$(this).addClass('cur');
+	})
+
+	$('.recListD').live('mouseout', function() {
+		$(this).removeClass('cur');
+	})
+
+	$('.removeLog').live('click', function() {
+		var id = $(this).attr('id');
+		removePlayLog(id);		
+	})
+	
+	$('.delHistory').live('click', function() {
+		var id = $(this).attr('id').replace('lookHistory_','');
+		removePlayLog(id);		
+	})
+	//学习记录 end
+	
+	//course cate
+	$(".pulldown-nav").hover(function(){
+		$(this).find(".f-icon").addClass("hover");
+		$(this).find(".pulldown").show();
+		$(this).find(".ico-drop").show();
+	},function(){
+		$(this).find(".pulldown").hide();
+		$(this).find(".ico-drop").hide();
+		$(this).find(".f-icon").removeClass("hover");
+	});
+	
+	
+	$('.goTop').bind('click',function() {
+        $("html, body").animate({ scrollTop: 0 }, 200);
+	});
+	$('.jianyi').bind('click',function(){
+      $.dialog({
+        id:'tickDialog',
+        title:'我有话对管家说（客服邮箱：edu@51cto.com）',
+        content:'url:/index.php?do=tick',
+        max:false,
+        min:false,
+        lock: true
+      });
+	});
+	
+	
+	$(".Mebox").hide();
+	$(".goTop,.TPbox").css({ width: "42px", overflow: "hidden" });
+	$(".TPbox a,.goTop a").css({ "padding-left": "48px", overflow: "hidden" });
+	$(".Tfold").toggle(
+		function(){
+			$(".Tfold a").addClass("cur").html("收起");
+			var adNum = $('.Mebox').children('a').size();
+			var h = adNum * 37 + 102;
+			$(".isidebar").animate({ 
+				width: "100px",
+				height: h + 'px'
+				}, 500 );
+				$(".Mebox").show();
+				$(".goTop,.TPbox").css({ width: "", overflow: "hidden" });
+				$(".TPbox a,.goTop a").css({ "padding-left": "39px", overflow: "hidden" });
+		},
+		
+		function(){
+			$(".Tfold a").removeClass("cur").html("展开");
+			$(".isidebar").animate({ 
+				width: "50px",
+				height: "102px"
+				}, 500 );
+				$(".Mebox").hide();
+				$(".goTop,.TPbox").css({ width: "", overflow: "hidden" });
+				$(".TPbox a,.goTop a").css({ "padding-left": "48px", overflow: "hidden" });
+			}
+	);
+
+	//右侧漂浮栏
+	$(".FixedSideBar_Notice").bind('mouseenter',function(){//
+		$(this).addClass('FixedSideBar_NoticeCur');
+		$(this).children('p').siblings().fadeIn(100);
+	}).bind('mouseleave',function(){//
+		$(this).removeClass('FixedSideBar_NoticeCur');
+		$(this).children('p').siblings().fadeOut(100);
+	});
+	$(".FixedSideBar_iPad").bind('mouseenter',function(){//
+		$(this).children('div').fadeIn(100);
+	}).bind('mouseleave',function(){//
+		$(this).children('div').fadeOut(100);
+	});
+	$(".FixedSideBar_GoTop").click(function(){
+		$(window).scrollTop(0);
+	});
+	$(".FixedSideBar_Contact").bind('mouseenter',function(){//
+		$(this).children('div').fadeIn(100);
+	}).bind('mouseleave',function(){//
+		$(this).children('div').fadeOut(100);
+	});
+	//显示课程
+	$("#HeaderCourse").bind('mouseenter',function(){
+		$("#HeaderCourseALL").slideDown(300);
+		$("#HeaderCourse").children('a').addClass('gre');
+	}).bind('mouseleave',function(){
+		$("#HeaderCourseALL").hide();
+		$("#HeaderCourse").children('a').removeClass('gre');
+	});
+	//关闭漂浮的二维码
+	$(".closeQrFloat").click(function(){
+		$(this).parent().remove();
+	});
+
+	//顶部更多
+	$(".TopNavMore").mouseenter(function(){
+		$(this).addClass('TopNavMore-arrow_hover');
+		$(this).children('div').slideDown(300);
+	}).mouseleave(function(){
+		$(this).removeClass('TopNavMore-arrow_hover');
+		$(this).children('div').hide();
+	});
+})
+	
+//设置COOKIE
+function setCookie(name, value, iDay) {
+    var oDate = new Date();
+	oDate.setTime(oDate.getTime() + iDay*1000); 
+	var dateStr = ( iDay == 0 ) ? '' : ';expires='+oDate.toGMTString();
+    document.cookie = name+'='+value+dateStr+';path=/';
+}
+//获取cookie
+function getCookie(name) {
+    var arr = document.cookie.split('; ');
+    var i = 0;
+    for(i=0; i<arr.length; i++) {
+        var arr2 = arr[i].split('=');
+        if(arr2[0] == name) {return arr2[1];}
+    }
+    return '';
+}
+//删除cookie
+function removeCookie(name) {
+    setCookie(name,'',-1);
+}
+
+function SplitString(value,len){
+	var _tmp = '';
+	var _length = 0;
+
+	for (var i = 0; i < value.length; i++) {
+		if (value.charCodeAt(i) > 255) {
+			_length++;
+			_length++;
+		}else{
+			_length++;
+		}
+		if(_length<len){
+			_tmp+=value.charAt(i);
+		}
+	}
+	if(_length>=len){
+		_tmp+='..';
+	}
+	return _tmp;
+}
+function GetLength(value){
+	var _tmp = value;
+	var _length = 0;
+
+	for (var i = 0; i < _tmp.length; i++) {
+		if (_tmp.charCodeAt(i) > 255) {
+			_length = _length + 2;
+		}else {
+			_length++;
+		}
+	}
+	return _length;
+}
+
+//header ad
+/*
+var is_home_tx_show = false;
+var div_home_tx = document.getElementById("home_tx");
+var div_home_tx_in = document.getElementById("home_tx_in");
+var stepms = 10;
+
+function home_tx_show(){
+	var newHeaderTopShow = getCookie('newHeaderTopShow');
+	if(newHeaderTopShow && newHeaderTopShow > 0){
+		$('#edu-header-ad-kg').attr('isShow', 'none');//隐藏
+	}else{
+		home_tx_stepshow();
+	}
+}
+function home_tx_stepshow(){
+	var curHeight = parseInt(div_home_tx.offsetHeight);
+	if(curHeight>=37){
+		is_home_tx_show = true;
+	}else{
+		div_home_tx.style.height = (curHeight + 4) + "px";
+		div_home_tx_in.style.top = (parseInt(div_home_tx_in.style.top)+4)+"px";
+		window.setTimeout(home_tx_stepshow,30);
+	}
+}
+function home_tx_hide(){
+	if(is_home_tx_show){
+		home_tx_stephide()
+	}else{
+		window.setTimeout(home_tx_stephide,1200);
+	}
+}
+
+function home_tx_stephide(){
+	var curHeight = parseInt(div_home_tx.style.height);
+	if(curHeight<=0){
+		is_home_tx_show = false;
+	}else{
+		try{
+			div_home_tx.style.height = (curHeight - 4) + "px";
+    		div_home_tx_in.style.top = (parseInt(div_home_tx_in.style.top)-4)+"px";
+    		window.setTimeout(home_tx_stephide,30);
+		} catch(e) {}
+		setCookie('newHeaderTopShow', 1, 0);//当前会话结束
+	}
+}
+
+*/
+//广告for顶部伸缩
+function top_gg_s(){
+	$("#TopGGS").css({
+		'text-align':'center',
+		'position':'absolute',
+		'width':'100%',
+		'z-index':'999',
+		'top':'0',
+		'left':'0',
+		'height':90
+	});
+	var newHeaderTopGGSShow = getCookie('newHeaderTopGGSShow');
+	var img1 = $("#TopGGS input").eq(0).val();
+	var img2 = $("#TopGGS input").eq(1).val();
+	var url = $("#TopGGS input").eq(2).val();
+	var i1 = $('<img src="'+img1+'" />');
+	var i2 = $('<img src="'+img2+'" style="width:1190px;margin-top:-100%;"/>');
+	if(!newHeaderTopGGSShow && typeof(isHOMEPAGAE)=='boolean'){
+		$("#TopGGS").append(i2);
+		$(i2).animate({'margin-top':'0'},500,function(){
+			$(this).wrap("<a href='"+url+"' target='_blank'></a>");
+		});
+		setTimeout(function(){
+			$(i2).animate({'margin-top':'-100%'},1500);
+		},5000);
+		setTimeout(function(){
+			$(i2).unwrap().remove();
+			$("#TopGGS").css('position','static');
+			$("#TopGGS").append(i1);
+			$(i1).wrap("<a href='"+url+"' target='_blank'></a>");
+		},5500);
+		setCookie('newHeaderTopGGSShow', 1, 0);//当前会话结束
+	}else{
+		$("#TopGGS").css('position','static');
+		$("#TopGGS").append(i1);
+		$(i1).wrap("<a href='"+url+"' target='_blank'></a>");
+	}
+	
+	//
+}
+if($("#TopGGS").length>0){
+	top_gg_s();
+}
+/**/
+/*
+if(window.addEventListener){
+	window.addEventListener("load",showTopAD,false);
+}else{
+	window.attachEvent("onload",showTopAD);
+}
+
+
+*/

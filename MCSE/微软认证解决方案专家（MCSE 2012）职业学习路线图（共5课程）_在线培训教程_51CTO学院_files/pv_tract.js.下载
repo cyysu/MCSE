@@ -1,0 +1,635 @@
+var local = window.location.protocol+'//'+window.location.host;
+
+var courseUrl = local+'/course/course_id'; //课程页地址
+var courseUrl2 = local+'/index.php?do=course&course_id';
+var courseUrl3 = local+'/?do=course&course_id';
+
+var url = { "roadmapUrl":local+"/roadmap/view/", //路线图地址
+		"packUrl":local+"/pack/view/", //套餐地址
+		"cardUrl":local+"/member/id", //会员卡地址
+		"lecUrl":local+"/lecturer/user_id-"}; //讲师地址
+
+var lessionUrl = local+'/lesson/id'; //课时页地址
+var lessionUrl2 = local+'/lession/id';
+var lessionUrl3 = local+'/?do=lession&id';
+var lessionUrl4 = local+'/?do=lesson&id';
+var lessionUrl5 = local+'/index.php?do=lesson&id';
+var lessionUrl6 = local+'/index.php?do=lession&id';
+
+// 微信免费版地址
+var wapUrl = local+'/wap.php';
+var wapCourseUrl = '/wap.php?do=course&m=courseInfo';
+if(_realUrl){
+	
+}else{
+	var _realUrl = '';
+}
+
+			
+$(document).ready(function(){
+
+	function sends(pvlog){
+
+		var str = '';
+
+		for(var key in pvlog){
+			str = str + pvlog[key]+'&';
+		}
+		str = str.substr(0,str.length-1);
+
+		vv_log.send( str);
+
+	}
+	
+	/*******pv日志 begin*******/
+	if( (vv_log.cur_url()).indexOf(lessionUrl) != '-1' || (vv_log.cur_url()).indexOf(lessionUrl2) != '-1' || (vv_log.cur_url()).indexOf(lessionUrl3) != '-1' || (vv_log.cur_url()).indexOf(lessionUrl4) != '-1' || (vv_log.cur_url()).indexOf(lessionUrl5) != '-1' || (vv_log.cur_url()).indexOf(lessionUrl6) != '-1')
+	{
+		// 播放页面培训班推广位置点击
+		$("#ADsList>li>a").click(function(){
+				
+				var title = $(this).attr('title');
+
+				click_main.kind = 10;
+				click_main.course_id = 0;
+				click_main.refer = encodeURIComponent(vv_log.cur_url().replace(/&/g,'<#>'));
+				click_main.cur = encodeURIComponent(domains+ ($(this).attr('href').replace(/&/g,'<#>')) );
+				click_main.title = encodeURIComponent(title.replace(/&/g,'<#>'));
+				click_main.ip = ip;
+				click_main.rmid = 0;
+				click_main.packid = 0;
+				click_main.cardid = 0;
+				click_main.lecid = 0;
+				click_main.levelid = 'null';
+				click_main.ifnew = pv_log.ifnew('ifnewuser');
+				click_main.adid = 'mp4'; //点击日志中 广告位id怎么提供呢 课程 100004
+				click_main.agents = encodeURIComponent(navigator.userAgent);
+				click_main.time = vv_log.timestamp();
+				click_main.cookieidOther = 0;
+				click_main.unitType = 'pc';
+				click_main.source = 0;
+
+				sends( click_main );
+			
+		});
+			
+	}else{
+		
+		var pv_main = {
+			init :function(){
+				var pvlog = {};
+				pvlog.kind = 1;
+				pvlog.sessionid = sessionid;
+				pvlog.cookieid = vv_log.isCookie('cookiename');
+				pvlog.userid = user_id;
+				pvlog.course_id = pv_log.course_id()[0];
+				pvlog.refer = encodeURIComponent(vv_log.from_referrer().replace(/&/g,'<#>'));
+				pvlog.cur = encodeURIComponent(vv_log.cur_url().replace(/&/g,'<#>'));
+				if( _realUrl.indexOf('wap.php') != '-1'){
+					pvlog.refer = encodeURIComponent(_fromPage.replace(/&/g,'<#>')); 
+					pvlog.cur = encodeURIComponent( (_realUrl).replace(/&/g,'<#>'));
+				}
+				pvlog.title = encodeURIComponent(pv_log.title);
+				pvlog.ip = ip;
+				pvlog.rmid = pv_log.id()[0];
+				pvlog.packid = (vv_log.cur_url()).indexOf(courseUrl) != '-1' || (vv_log.cur_url()).indexOf(courseUrl2) != '-1' ? pv_log.course_id()[2] : pv_log.id()[1];
+				pvlog.cardid = pv_log.id()[2];
+				pvlog.lecid = pv_log.id()[3];
+				pvlog.levelid = pv_log.course_id()[1];
+				pvlog.ifnew = pv_log.ifnew('ifnewuser');
+				pvlog.adid = pv_log.splits();
+				pvlog.agents = encodeURIComponent(navigator.userAgent);
+				pvlog.time = vv_log.timestamp();
+				pvlog.cookieidOther = vv_log.getCookie('www51cto') ? vv_log.getCookie('www51cto') : 0;
+				pvlog.unitType = 'pc';
+
+				if( (vv_log.cur_url()).indexOf(wapUrl) != '-1' ){
+					pvlog.unitType = 'wap';
+				}
+				pvlog.source = source;
+
+				return pvlog;
+			} 
+		}
+		var pv_main_right = {
+			init :function(){
+				var pvlog = {};
+				pvlog.kind = 9;
+				pvlog.sessionid = sessionid;
+				pvlog.cookieid = vv_log.isCookie('cookiename');
+				pvlog.userid = user_id;
+				pvlog.course_id = pv_log.course_id()[0];
+				pvlog.refer = encodeURIComponent(vv_log.from_referrer().replace(/&/g,'<#>'));
+				pvlog.cur = encodeURIComponent(vv_log.cur_url().replace(/&/g,'<#>'));
+				if( _realUrl.indexOf('wap.php') != '-1'){
+					pvlog.refer = encodeURIComponent(_fromPage.replace(/&/g,'<#>')); 
+					pvlog.cur = encodeURIComponent( (_realUrl).replace(/&/g,'<#>'));
+				}
+				pvlog.title = encodeURIComponent(pv_log.title);
+				pvlog.ip = ip;
+				pvlog.rmid = pv_log.id()[0];
+				pvlog.packid = (vv_log.cur_url()).indexOf(courseUrl) != '-1' || (vv_log.cur_url()).indexOf(courseUrl2) != '-1' ? pv_log.course_id()[2] : pv_log.id()[1];
+				pvlog.cardid = pv_log.id()[2];
+				pvlog.lecid = pv_log.id()[3];
+				pvlog.levelid = pv_log.course_id()[1];
+				pvlog.ifnew = pv_log.ifnew('ifnewuser');
+				pvlog.adid = 'mp1';
+				pvlog.agents = encodeURIComponent(navigator.userAgent);
+				pvlog.time = vv_log.timestamp();
+				pvlog.cookieidOther = vv_log.getCookie('www51cto') ? vv_log.getCookie('www51cto') : 0;
+				pvlog.unitType = 'pc';
+
+				if( (vv_log.cur_url()).indexOf(wapUrl) != '-1' ){
+					pvlog.unitType = 'wap';
+				}
+				pvlog.source = source;
+
+				return pvlog;
+			} 
+		}
+
+		// 课程详情页 学习过此课程的人还学习了 日志发送
+		var pv_main_other_study = {
+			init :function(){
+				var pvlog = {};
+				pvlog.kind = 9;
+				pvlog.sessionid = sessionid;
+				pvlog.cookieid = vv_log.isCookie('cookiename');
+				pvlog.userid = user_id;
+				pvlog.course_id = pv_log.course_id()[0];
+				pvlog.refer = encodeURIComponent(vv_log.from_referrer().replace(/&/g,'<#>'));
+				pvlog.cur = encodeURIComponent(vv_log.cur_url().replace(/&/g,'<#>'));
+				if( _realUrl.indexOf('wap.php') != '-1'){
+					pvlog.refer = encodeURIComponent(_fromPage.replace(/&/g,'<#>')); 
+					pvlog.cur = encodeURIComponent( (_realUrl).replace(/&/g,'<#>'));
+				}
+				pvlog.title = encodeURIComponent(pv_log.title);
+				pvlog.ip = ip;
+				pvlog.rmid = pv_log.id()[0];
+				pvlog.packid = (vv_log.cur_url()).indexOf(courseUrl) != '-1' || (vv_log.cur_url()).indexOf(courseUrl2) != '-1' ? pv_log.course_id()[2] : pv_log.id()[1];
+				pvlog.cardid = pv_log.id()[2];
+				pvlog.lecid = pv_log.id()[3];
+				pvlog.levelid = pv_log.course_id()[1];
+				pvlog.ifnew = pv_log.ifnew('ifnewuser');
+				pvlog.adid = 'mp2';
+				pvlog.agents = encodeURIComponent(navigator.userAgent);
+				pvlog.time = vv_log.timestamp();
+				pvlog.cookieidOther = vv_log.getCookie('www51cto') ? vv_log.getCookie('www51cto') : 0;
+				pvlog.unitType = 'pc';
+
+				if( (vv_log.cur_url()).indexOf(wapUrl) != '-1' ){
+					pvlog.unitType = 'wap';
+				}
+				pvlog.source = source;
+
+				return pvlog;
+			} 
+		}
+
+		// 课程详情页 可能感兴趣的课程 日志发送
+		var pv_main_other_like = {
+			init :function(){
+				var pvlog = {};
+				pvlog.kind = 9;
+				pvlog.sessionid = sessionid;
+				pvlog.cookieid = vv_log.isCookie('cookiename');
+				pvlog.userid = user_id;
+				pvlog.course_id = pv_log.course_id()[0];
+				pvlog.refer = encodeURIComponent(vv_log.from_referrer().replace(/&/g,'<#>'));
+				pvlog.cur = encodeURIComponent(vv_log.cur_url().replace(/&/g,'<#>'));
+				if( _realUrl.indexOf('wap.php') != '-1'){
+					pvlog.refer = encodeURIComponent(_fromPage.replace(/&/g,'<#>')); 
+					pvlog.cur = encodeURIComponent( (_realUrl).replace(/&/g,'<#>'));
+				}
+				pvlog.title = encodeURIComponent(pv_log.title);
+				pvlog.ip = ip;
+				pvlog.rmid = pv_log.id()[0];
+				pvlog.packid = (vv_log.cur_url()).indexOf(courseUrl) != '-1' || (vv_log.cur_url()).indexOf(courseUrl2) != '-1' ? pv_log.course_id()[2] : pv_log.id()[1];
+				pvlog.cardid = pv_log.id()[2];
+				pvlog.lecid = pv_log.id()[3];
+				pvlog.levelid = pv_log.course_id()[1];
+				pvlog.ifnew = pv_log.ifnew('ifnewuser');
+				pvlog.adid = 'mp3';
+				pvlog.agents = encodeURIComponent(navigator.userAgent);
+				pvlog.time = vv_log.timestamp();
+				pvlog.cookieidOther = vv_log.getCookie('www51cto') ? vv_log.getCookie('www51cto') : 0;
+				pvlog.unitType = 'pc';
+
+				if( (vv_log.cur_url()).indexOf(wapUrl) != '-1' ){
+					pvlog.unitType = 'wap';
+				}
+				pvlog.source = source;
+
+				return pvlog;
+			} 
+		}
+
+		
+		
+		//发送消息
+		sends(pv_main.init()) ;
+		$.ajax({
+		   url:'/index.php?do=index&m=checkPersonalityData',
+		   type: "POST",
+		   async:true, 
+		   data: {},
+		   dataType:'json',
+		   success: function (data) {
+				if(data.status!=0){
+					if(typeof(sendtype)!="undefined"){
+						sends(pv_main_right.init()) ;
+					}
+				}
+			}
+		})
+		
+		if( (vv_log.cur_url()).indexOf(courseUrl) != '-1' || (vv_log.cur_url()).indexOf(courseUrl2) != '-1' || (vv_log.cur_url()).indexOf(courseUrl3) != '-1' ){
+			if(returnData != ''){
+				sends(pv_main_other_study.init());
+			}
+		}
+
+		if( (vv_log.cur_url()).indexOf(courseUrl) != '-1' || (vv_log.cur_url()).indexOf(courseUrl2) != '-1' || (vv_log.cur_url()).indexOf(courseUrl3) != '-1' ){
+			if(returnLikeCourse != ''){
+				sends(pv_main_other_like.init());
+			}
+		}
+		
+	}
+	
+	/*******pv日志 end*******/
+	
+	/*****点击日志 begin*****/
+	var clickUrl = {
+		"clickRoadmapUrl":local+"/roadmap/",  //路线图列表
+		"clickCourseUrl":local+"/course/courseList/",  //课程列表
+		"clickCourseUrl2":local+"/?do=course&m=courseList",
+		"clickCourseUrl3":local+"/index.php?do=course&course_id",
+
+		"clickCourseUrl4":local+'/course/course_id', // 课程页地址
+		"clickCourseUrl5":local+'/index.php?do=course&course_id',
+		"clickCourseUrl6":local+'/?do=course&course_id',
+
+		"clickMemberUrl":local+"/member/index"  //会员卡列表
+	}
+	
+	//点击日志 数据
+	var domains = 'http://edu.51cto.com';
+	var click_main = {};
+	click_main.kind = 2;
+	click_main.sessionid = sessionid;
+	click_main.cookieid = vv_log.isCookie('cookiename');
+	click_main.userid = user_id;
+	
+	for(var key in clickUrl){
+
+		var returnVal = (vv_log.cur_url()).indexOf(clickUrl[key]) ;
+		//路线图
+		if(key == 'clickRoadmapUrl' && returnVal != '-1' ){
+			
+			//点击链接发送 点击日志
+			$(".map-li a").click(function(){
+
+				if($(this).attr('href')){
+					var rmid = $(this).attr('rmid');
+					var title = $(this).attr('title');
+					
+					click_main.course_id = 0;
+					click_main.refer = encodeURIComponent(vv_log.cur_url().replace(/&/g,'<#>'));
+					click_main.cur = encodeURIComponent(domains+ ($(this).attr('href').replace(/&/g,'<#>')) );
+					click_main.title = encodeURIComponent(title.replace(/&/g,'<#>'));
+					click_main.ip = ip;
+					click_main.rmid = rmid;
+					click_main.packid = 0;
+					click_main.cardid = 0;
+					click_main.lecid = 0;
+					click_main.levelid = 'null';
+					click_main.ifnew = pv_log.ifnew('ifnewuser');
+					click_main.adid = 100002; //点击日志中 广告位id怎么提供呢 路线图 100002
+					click_main.agents = encodeURIComponent(navigator.userAgent);
+					click_main.time = vv_log.timestamp();
+					click_main.cookieidOther = 0;
+					click_main.unitType = 'pc';
+					click_main.source = 0;
+					sends( click_main );
+				}
+			});
+			
+		}
+		//课程列表
+		if( (key == 'clickCourseUrl' || key == 'clickCourseUrl2' || key == 'clickCourseUrl3') && returnVal != '-1' ){
+			
+			//点击链接发送 点击日志
+			$(".CourseVideoListItem a").click(function(){
+
+				if($(this).attr('href')){
+					var course_id = $(this).attr('course_id');
+					var title = $(this).attr('title');
+					
+					click_main.course_id = course_id;
+					click_main.refer = encodeURIComponent(vv_log.cur_url().replace(/&/g,'<#>'));
+					click_main.cur = encodeURIComponent(domains+ ($(this).attr('href').replace(/&/g,'<#>')) );
+					click_main.title = encodeURIComponent(title.replace(/&/g,'<#>'));
+					click_main.ip = ip;
+					click_main.rmid = 0;
+					click_main.packid = 0;
+					click_main.cardid = 0;
+					click_main.lecid = 0;
+					click_main.levelid = 'null';
+					click_main.ifnew = pv_log.ifnew('ifnewuser');
+					click_main.adid = 100000; //点击日志中 广告位id怎么提供呢 课程 100000
+					click_main.agents = encodeURIComponent(navigator.userAgent);
+					click_main.time = vv_log.timestamp();
+					click_main.cookieidOther = 0;
+					click_main.unitType = 'pc';
+					click_main.source = 0;
+					
+					sends( click_main );
+				}
+			});
+			//课程页右侧推荐位置
+			$(".TabListItem2 a").click(function(){
+
+				if($(this).attr('href')){
+					var course_id = $(this).attr('course_id');
+					var title = $(this).attr('title');
+					click_main.kind = 10;
+					click_main.course_id = course_id;
+					click_main.refer = encodeURIComponent(vv_log.cur_url().replace(/&/g,'<#>'));
+					click_main.cur = encodeURIComponent(domains+ ($(this).attr('href').replace(/&/g,'<#>')) );
+					click_main.title = encodeURIComponent(title.replace(/&/g,'<#>'));
+					click_main.ip = ip;
+					click_main.rmid = 0;
+					click_main.packid = 0;
+					click_main.cardid = 0;
+					click_main.lecid = 0;
+					click_main.levelid = 'null';
+					click_main.ifnew = pv_log.ifnew('ifnewuser');
+					click_main.adid = 'mp1'; //课程右侧推荐位置 100001
+					click_main.agents = encodeURIComponent(navigator.userAgent);
+					click_main.time = vv_log.timestamp();
+					click_main.cookieidOther = 0;
+					click_main.unitType = 'pc';
+					click_main.source = 0;
+					$.ajax({
+					   url:'/index.php?do=index&m=checkPersonalityData',
+					   type: "POST",
+					   async:true, 
+					   data: {},
+					   dataType:'json',
+					   success: function (data) {
+							if(data.status!=0){
+								sends( click_main );
+							}
+						}
+					})
+					
+				}
+			});
+			
+		}
+
+		//课程详情页
+		if( (key == 'clickCourseUrl4' || key == 'clickCourseUrl5' || key == 'clickCourseUrl6') && returnVal != '-1' ){
+			//学习过此课程的人还学习了
+			$(".study_other_course a").click(function(){
+
+				if($(this).attr('href')){
+					var course_id = $(this).attr('course_id');
+					var title = $(this).attr('title');
+					click_main.kind = 10;
+					click_main.course_id = course_id;
+					click_main.refer = encodeURIComponent(vv_log.cur_url().replace(/&/g,'<#>'));
+					click_main.cur = encodeURIComponent(domains+ ($(this).attr('href').replace(/&/g,'<#>')) );
+					click_main.title = encodeURIComponent(title.replace(/&/g,'<#>'));
+					click_main.ip = ip;
+					click_main.rmid = 0;
+					click_main.packid = packid;
+					click_main.cardid = 0;
+					click_main.lecid = 0;
+					click_main.levelid = levelid;
+					click_main.ifnew = pv_log.ifnew('ifnewuser');
+					click_main.adid = 'mp2'; //课程右侧推荐位置 100001
+					click_main.agents = encodeURIComponent(navigator.userAgent);
+					click_main.time = vv_log.timestamp();
+					click_main.cookieidOther = 0;
+					click_main.unitType = 'pc';
+					click_main.source = 0;
+					if(returnData != ''){
+						sends(click_main);
+					}
+				}
+			});
+			
+		}
+
+		//课程详情页 之 可能感兴趣的课程
+		if( (key == 'clickCourseUrl4' || key == 'clickCourseUrl5' || key == 'clickCourseUrl6') && returnVal != '-1' ){
+			//学习过此课程的人还学习了
+			$(".UWillLike a").click(function(){
+				if($(this).attr('href') && $(this).attr('title')){
+					var course_id = $(this).attr('course_id');
+					var title = $(this).attr('title');
+					click_main.kind = 10;
+					click_main.course_id = course_id;
+					click_main.refer = encodeURIComponent(vv_log.cur_url().replace(/&/g,'<#>'));
+					click_main.cur = encodeURIComponent(domains+ ($(this).attr('href').replace(/&/g,'<#>')) );
+					click_main.title = encodeURIComponent(title.replace(/&/g,'<#>'));
+					click_main.ip = ip;
+					click_main.rmid = 0;
+					click_main.packid = packid;
+					click_main.cardid = 0;
+					click_main.lecid = 0;
+					click_main.levelid = levelid;
+					click_main.ifnew = pv_log.ifnew('ifnewuser');
+					click_main.adid = 'mp3'; //课程右侧推荐位置 100001
+					click_main.agents = encodeURIComponent(navigator.userAgent);
+					click_main.time = vv_log.timestamp();
+					click_main.cookieidOther = 0;
+					click_main.unitType = 'pc';
+					click_main.source = 0;
+					if(returnLikeCourse != ''){
+						sends(click_main);
+					}
+				}
+			});
+			
+		}
+
+		//会员卡列表
+		if( key == 'clickMemberUrl' && returnVal != '-1' ){
+			
+			//点击链接发送 点击日志
+			$(".card a,.member_view").click(function(){
+
+					var parObj = $(this).parents('.card');
+					var priObj = parObj.find('.p_level');
+				
+					var cardid = priObj.attr('mid');
+					var title = parObj.find('.cart-title').html();
+					
+					click_main.course_id = 0;
+					click_main.refer = encodeURIComponent(vv_log.cur_url().replace(/&/g,'<#>'));
+					click_main.cur = encodeURIComponent(domains+ ($(this).attr('href').replace(/&/g,'<#>')) );
+					click_main.title = encodeURIComponent(title.replace(/&/g,'<#>'));
+					click_main.ip = ip;
+					click_main.rmid = 0;
+					click_main.packid = 0;
+					click_main.cardid = cardid;
+					click_main.lecid = 0;
+					click_main.levelid = 'null';
+					click_main.ifnew = pv_log.ifnew('ifnewuser');
+					click_main.adid = 100004; //点击日志中 广告位id怎么提供呢 课程 100004
+					click_main.agents = encodeURIComponent(navigator.userAgent);
+					click_main.time = vv_log.timestamp();
+					click_main.cookieidOther = 0;
+					click_main.unitType = 'pc';
+					click_main.source = 0;
+
+					sends( click_main );
+				
+			});
+			
+		}
+		
+	}
+	
+	//学院内部广告位点击
+	$('.edu-ad').bind('click',function(){
+		var adid = $(this).attr('ad_id');
+		var cur = $(this).find('a').attr('href');
+		if( cur != '' ){
+			click_main.kind = 8;
+			click_main.sessionid = sessionid;
+			click_main.cookieid = vv_log.isCookie('cookiename');
+			click_main.userid = user_id;
+			click_main.course_id = 0;
+			click_main.refer = encodeURIComponent(vv_log.cur_url().replace(/&/g,'<#>'));
+			click_main.cur = encodeURIComponent( cur.replace(/&/g,'<#>') );
+			click_main.title = encodeURIComponent(document.title.replace(/&/g,'<#>'));
+			click_main.ip = ip;
+			click_main.rmid = 0;
+			click_main.packid = 0;
+			click_main.cardid = 0;
+			click_main.lecid = 0;
+			click_main.levelid = 'null';
+			click_main.ifnew = pv_log.ifnew('ifnewuser');
+			click_main.adid = adid; //点击日志中 广告位id
+			click_main.agents = encodeURIComponent(navigator.userAgent);
+			click_main.time = vv_log.timestamp();
+			click_main.cookieidOther = 0;
+			click_main.unitType = 'pc';
+			click_main.source = 0;
+			sends( click_main );
+		}
+	});
+	
+	/*****点击日志 end*****/
+	
+
+});
+
+/*******pv日志 begin*******/
+var pv_log = {
+	course_id : function(){
+	
+		//课程页有 course_id
+		var courseInfo = new Array();
+		if( (vv_log.cur_url()).indexOf(courseUrl) != '-1' || (vv_log.cur_url()).indexOf(courseUrl2) != '-1' || (vv_log.cur_url()).indexOf(courseUrl3) != '-1' ){
+			courseInfo[0] = course_id;
+			courseInfo[1] = levelid;
+			courseInfo[2] = packid;
+		}else if( (_realUrl).indexOf(wapCourseUrl) != '-1' ){
+			courseInfo[0] = course_id;
+			courseInfo[1] = levelid;
+			courseInfo[2] = 0;
+		}else{
+			courseInfo[0] = 0;
+			courseInfo[1] = 'null';
+			courseInfo[2] = 0;
+		}
+		return courseInfo;
+	},
+	title : document.title.replace(/&/g,'<#>'),
+	 id : function(){
+		var ids = new Array(0,0,0,0);
+		for(var key in url){
+			var returnVal = (vv_log.cur_url()).indexOf(url[key]) ;
+			
+			if(key == 'roadmapUrl' && returnVal != '-1'){
+				ids[0] = rmid;
+			}
+			else if(key == 'packUrl' && returnVal != '-1'){
+				ids[1] = packid;
+			}
+			else if(key == 'cardUrl' && returnVal != '-1'){
+				ids[2] = cardid;
+			}
+			else if(key == 'lecUrl' && returnVal != '-1'){
+				ids[3] = lecid;
+			}		
+		}
+		return ids;
+	}, 
+		
+	ifnew : function(name){
+		if(vv_log.getCookie(name) == ''){
+			vv_log.setCookie(name,1,3650);
+			return 0;
+		}else{
+			return 1;
+		}
+		
+	},
+	splits : function(){
+		var str = vv_log.cur_url();
+		var adid = 0;
+		
+		if(str.indexOf('?') != '-1'){
+		
+			parastr = str.split("?")[1]; 
+			var arr = parastr.split("&");
+
+			for(i=0;i<arr.length;i++){
+				var key = arr[i].split('=')[0];
+				if(key == 'edu_recommend_adid'){
+					adid = arr[i].split('=')[1]; break;
+				}
+				
+			}	
+		}
+		return adid;
+		
+	}
+}
+/*******pv日志 end*******/
+
+
+/*****购物车 begin*****/
+
+//加入购物车 参数分别为：总额 购物车课程id（#分割）
+function cartTract(price,cartCourseId,user_id,source){
+	var gwc_main = {};
+	gwc_main.kind = 6;
+	gwc_main.sessionid = sessionid;
+	gwc_main.cookieid = vv_log.isCookie('cookiename');
+	gwc_main.userid = user_id;
+	gwc_main.vid = 0;
+	gwc_main.refer = encodeURIComponent(vv_log.from_referrer().replace(/&/g,'<#>'));
+	gwc_main.cur = encodeURIComponent(vv_log.cur_url().replace(/&/g,'<#>'));
+	gwc_main.amount = price;
+	gwc_main.rmid = 0;
+	gwc_main.packid = 0;
+	gwc_main.cardid = 0;
+	gwc_main.courseid = cartCourseId;
+	gwc_main.unitType = 'pc';
+	gwc_main.source = source;
+	
+	var str = '';
+	for(var key in gwc_main){
+		str = str + gwc_main[key]+'&';
+	}
+	str = str.substr(0,str.length-1);
+	vv_log.send( str);
+}
+
+/*****购物车 end*****/
